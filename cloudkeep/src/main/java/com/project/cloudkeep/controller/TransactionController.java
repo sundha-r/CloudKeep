@@ -1,0 +1,30 @@
+package com.project.cloudkeep.controller;
+
+import com.project.cloudkeep.document.PaymentTransaction;
+import com.project.cloudkeep.document.ProfileDocument;
+import com.project.cloudkeep.repository.PaymentTransactionRepository;
+import com.project.cloudkeep.service.ProfileService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
+
+@RestController
+@RequiredArgsConstructor
+@RequestMapping("/transactions")
+public class TransactionController {
+
+    private final PaymentTransactionRepository paymentTransactionRepository;
+    private final ProfileService profileService;
+
+    @GetMapping()
+    public ResponseEntity<?> getUserTransactions(){
+        ProfileDocument currentProfile=profileService.getCurrentProfile();
+        String clerkId= currentProfile.getClerkId();
+       List<PaymentTransaction> transactions= paymentTransactionRepository.findByClerkIdAndStatusOrderByTransactionDateDesc(clerkId,"SUCCESS");
+       return ResponseEntity.ok(transactions);
+    }
+}
